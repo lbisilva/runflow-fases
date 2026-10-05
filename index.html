@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Runflow — Jornada de Implementação de Agentes</title>
+  <meta name="description" content="Entenda como funciona a jornada de implementação de agentes de IA da Runflow: Assessment, Build, Go-live e Expansion." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #ffffff;
+      color: #1a1a18;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      width: 100%;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 0.5px solid #e2e0d8;
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+    .nav-logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a18;
+      letter-spacing: -0.01em;
+    }
+    .nav-logo span { color: #534AB7; }
+    .nav-pill {
+      font-size: 11px;
+      font-weight: 500;
+      color: #888780;
+      background: #f4f3ef;
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 80px 32px 64px;
+    }
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: #534AB7;
+      margin-bottom: 16px;
+    }
+    .hero-title {
+      font-size: 42px;
+      font-weight: 500;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: #1a1a18;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+    .hero-desc {
+      font-size: 16px;
+      color: #5f5e5a;
+      line-height: 1.7;
+      max-width: 520px;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+    .divider hr {
+      border: none;
+      border-top: 0.5px solid #e2e0d8;
+    }
+
+    /* ── SECTION FASES ── */
+    .rf-section {
+      width: 100%;
+      padding: 64px 0 96px;
+      background: #ffffff;
+    }
+    .rf-container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+    .rf-heading {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: #888780;
+      margin: 0 0 10px 0;
+    }
+    .rf-title {
+      font-size: 28px;
+      font-weight: 500;
+      color: #1a1a18;
+      margin: 0 0 40px 0;
+      line-height: 1.25;
+      max-width: 480px;
+      letter-spacing: -0.01em;
+    }
+    .rf-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .rf-card {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      border: 0.5px solid #e2e0d8;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+    .rf-left {
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      border-right: 0.5px solid #e2e0d8;
+    }
+    .rf-right {
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+    }
+    .rf-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 6px;
+      width: fit-content;
+    }
+    .rf-card-title {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.45;
+      margin: 0;
+    }
+    .rf-desc {
+      font-size: 13.5px;
+      color: #5f5e5a;
+      line-height: 1.65;
+      margin: 0;
+    }
+    .rf-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .rf-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .rf-row-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #b4b2a9;
+      white-space: nowrap;
+      margin-top: 2px;
+      min-width: 60px;
+    }
+    .rf-row-text {
+      font-size: 13px;
+      color: #5f5e5a;
+      line-height: 1.55;
+      margin: 0;
+    }
+    .rf-divider {
+      height: 0.5px;
+      background: #e2e0d8;
+    }
+    .rf-saida-text {
+      font-size: 13px;
+      line-height: 1.55;
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .rf-card--assessment .rf-left { background: #EEEDFE; }
+    .rf-card--assessment .rf-badge { background: #CECBF6; color: #3C3489; }
+    .rf-card--assessment .rf-card-title { color: #3C3489; }
+    .rf-card--assessment .rf-saida-text { color: #534AB7; }
+
+    .rf-card--build .rf-left { background: #E6F1FB; }
+    .rf-card--build .rf-badge { background: #B5D4F4; color: #0C447C; }
+    .rf-card--build .rf-card-title { color: #0C447C; }
+    .rf-card--build .rf-saida-text { color: #185FA5; }
+
+    .rf-card--golive .rf-left { background: #EAF3DE; }
+    .rf-card--golive .rf-badge { background: #C0DD97; color: #27500A; }
+    .rf-card--golive .rf-card-title { color: #27500A; }
+    .rf-card--golive .rf-saida-text { color: #3B6D11; }
+
+    .rf-card--expansion .rf-left { background: #FAEEDA; }
+    .rf-card--expansion .rf-badge { background: #FAC775; color: #633806; }
+    .rf-card--expansion .rf-card-title { color: #633806; }
+    .rf-card--expansion .rf-saida-text { color: #854F0B; }
+
+    /* ── FOOTER ── */
+    .footer {
+      border-top: 0.5px solid #e2e0d8;
+      padding: 28px 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .footer p {
+      font-size: 12px;
+      color: #b4b2a9;
+    }
+
+    /* ── RESPONSIVO ── */
+    @media (max-width: 700px) {
+      .hero-title { font-size: 28px; }
+      .rf-card { grid-template-columns: 1fr; }
+      .rf-left { border-right: none; border-bottom: 0.5px solid #e2e0d8; }
+      .rf-section { padding: 48px 0 72px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <span class="nav-logo">Run<span>flow</span></span>
+    <span class="nav-pill">Página de exemplo</span>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="hero-eyebrow">Metodologia</p>
+    <h1 class="hero-title">Do diagnóstico ao agente em operação.</h1>
+    <p class="hero-desc">Uma jornada estruturada em quatro fases para implementar agentes de IA com resultado real — sem pular etapas, sem desperdício de esforço.</p>
+  </div>
+
+  <div class="divider"><hr /></div>
+
+  <!-- FASES -->
+  <section class="rf-section">
+    <div class="rf-container">
+
+      <p class="rf-heading">Como funciona</p>
+      <h2 class="rf-title">A jornada de implementação de agentes</h2>
+
+      <div class="rf-cards">
+
+        <div class="rf-card rf-card--assessment">
+          <div class="rf-left">
+            <span class="rf-badge">Assessment</span>
+            <p class="rf-card-title">Entender o negócio. Priorizar o que vira agente primeiro.</p>
+          </div>
+          <div class="rf-right">
+            <p class="rf-desc">O Deployment Partner e o AI Deployment Strategist mergulham na operação atual da sua empresa. Mapeiam processos, entrevistam stakeholders e identificam onde a IA tem mais ROI potencial. Esse é o momento de decidir o que entra primeiro.</p>
+            <div class="rf-meta">
+              <div class="rf-row">
+                <span class="rf-row-label">Dinâmica</span>
+                <p class="rf-row-text">Sessões com liderança e times operacionais + análise dos sistemas existentes.</p>
+              </div>
+              <div class="rf-divider"></div>
+              <div class="rf-row">
+                <span class="rf-row-label">Sai disso</span>
+                <p class="rf-saida-text">Roadmap priorizado de agentes por impacto e complexidade.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rf-card rf-card--build">
+          <div class="rf-left">
+            <span class="rf-badge">Build</span>
+            <p class="rf-card-title">Construir o primeiro agente do roadmap e conectá-lo aos seus sistemas.</p>
+          </div>
+          <div class="rf-right">
+            <p class="rf-desc">O AI Solutions Engineer entra em ação sobre o Runflow Agent OS. Desenvolve o primeiro agente do roadmap, integra com ERP, CRM e canais internos, configura governança e acompanha cada iteração. O Strategist acompanha, testa e valida se o agente está entregando o comportamento desenhado.</p>
+            <div class="rf-meta">
+              <div class="rf-row">
+                <span class="rf-row-label">Dinâmica</span>
+                <p class="rf-row-text">Desenvolvimento iterativo com validações frequentes e ciclo rápido de ajuste.</p>
+              </div>
+              <div class="rf-divider"></div>
+              <div class="rf-row">
+                <span class="rf-row-label">Sai disso</span>
+                <p class="rf-saida-text">Agente construído, integrado e validado em ambiente controlado.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rf-card rf-card--golive">
+          <div class="rf-left">
+            <span class="rf-badge">Go-live</span>
+            <p class="rf-card-title">Colocar o agente para processar o trabalho real da sua empresa.</p>
+          </div>
+          <div class="rf-right">
+            <p class="rf-desc">Momento em que o agente passa a operar no dia a dia da empresa. O time monitora de perto, ajusta o que precisa e garante que a transição do processo anterior para o agente aconteça com soavidade. Os humanos envolvidos no processo são treinados em como trabalhar junto com o agente.</p>
+            <div class="rf-meta">
+              <div class="rf-row">
+                <span class="rf-row-label">Dinâmica</span>
+                <p class="rf-row-text">Lançamento assistido com monitoramento contínuo e ajustes finos dos primeiros dias.</p>
+              </div>
+              <div class="rf-divider"></div>
+              <div class="rf-row">
+                <span class="rf-row-label">Sai disso</span>
+                <p class="rf-saida-text">Agente processando operações reais com governança ativa.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rf-card rf-card--expansion">
+          <div class="rf-left">
+            <span class="rf-badge">Expansion</span>
+            <p class="rf-card-title">Evoluir o que está rodando e levar novos agentes para operação.</p>
+          </div>
+          <div class="rf-right">
+            <p class="rf-desc">Uma vez que o primeiro agente está operando com resultado, a jornada continua em ciclo contínuo. O time refina o que já está rodando com feedback humano, entra no próximo agente do roadmap e mantém as cadências de acompanhamento estratégico. É uma relação contínua, não um projeto com fim.</p>
+            <div class="rf-meta">
+              <div class="rf-row">
+                <span class="rf-row-label">Dinâmica</span>
+                <p class="rf-row-text">Reuniões recorrentes — novos agentes conforme o roadmap melhora contínuo.</p>
+              </div>
+              <div class="rf-divider"></div>
+              <div class="rf-row">
+                <span class="rf-row-label">Sai disso</span>
+                <p class="rf-saida-text">Portfólio crescente de agentes, evoluindo com a operação.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>Runflow · Página de exemplo gerada com Claude → GitHub → Vercel</p>
+  </footer>
+
+</body>
+</html>
